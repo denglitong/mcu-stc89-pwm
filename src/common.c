@@ -20,9 +20,10 @@ void config_t0(unsigned int interval_ms) {
   unsigned long total_time_beats = 11059200 / 12 / 1000 * interval_ms;
   unsigned long init_time_beats = 65536 - total_time_beats;
 
-  EA = 1;       // enable global interrupt
-  ET0 = 1;      // enable Timer0 interrupt
-  TMOD = 0x01;  // set Timer0 mode TH0-TL0 16 bits timer
+  EA = 1;        // enable global interrupt
+  ET0 = 1;       // enable Timer0 interrupt
+  TMOD &= 0xF0;  // 清除 T0 的控制位
+  TMOD |= 0x01;  // set Timer0 mode TH0-TL0 16 bits timer
   // setup TH0 TL0 initial value
   TH0 = (unsigned char)(init_time_beats >> 8);
   TL0 = (unsigned char)(init_time_beats);
@@ -37,9 +38,10 @@ void config_t1(unsigned int interval_ms) {
   unsigned long total_time_beats = 11059200 / 12 / 1000 * interval_ms;
   unsigned long init_time_beats = 65536 - total_time_beats;
 
-  EA = 1;       // enable global interrupt
-  ET1 = 1;      // enable Timer0 interrupt
-  TMOD = 0x10;  // set Timer1 mode TH1-TL1 16 bits timer
+  EA = 1;        // enable global interrupt
+  ET1 = 1;       // enable Timer0 interrupt
+  TMOD &= 0x0F;  // 清除 T1 的控制位
+  TMOD |= 0x10;  // set Timer1 mode TH1-TL1 16 bits timer
   // setup TH1 TL1 initial value
   TH1 = (unsigned char)(init_time_beats >> 8);
   TL1 = (unsigned char)(init_time_beats);
@@ -63,7 +65,8 @@ void delay_ms_t0(unsigned int ms) {
   ET0 = 1;  // enable Timer0 interrupt
 
   // setup T0_M1 = 0, T0_M0 = 1 (Timer0 mode TH0-TL0 16 bits timer)
-  TMOD = 0x01;
+  TMOD &= 0xF0;  // 清除 T0 的控制位
+  TMOD |= 0x01;
 
   // setup TH0 TL0 initial value
   TH0 = 0xFC;
@@ -95,7 +98,8 @@ void delay_ms_t1(unsigned int ms) {
   ET1 = 1;  // enable Timer1 interrupt
 
   // setup T1_M1 = 0, T1_M0 = 1 (Timer1 mode TH1-TL1 16 bits timer)
-  TMOD = 0x10;
+  TMOD &= 0x0F;  // 清除 T1 的控制位
+  TMOD |= 0x10;
 
   // setup TH0 TL0 initial value
   TH1 = 0xFC;
@@ -133,7 +137,8 @@ void run_in_every_ms_t1(unsigned int total_millis, VoidFun *fun) {
   ET0 = 1;  // enable Timer0 interrupt
 
   // setup T1_M1 = 0, T1_M0 = 1 (Timer1 mode TH1-TL1 16 bits timer)
-  TMOD = 0x10;
+  TMOD &= 0x0F;  // 清除 T1 的控制位
+  TMOD |= 0x10;
 
   // setup TH0 TL0 initial value
   TH1 = 0xFC;
